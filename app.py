@@ -34,21 +34,30 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             filename = os.path.join(UPLOAD_DIR, file_item.filename)
             with open(filename, 'wb') as f:
                 f.write(file_item.file.read())
-            message = filename
 
-        hashed_message = sha1(message.encode())
+            # Calculate the hash of the uploaded file
+            file_hash = self.hash_file_with_sha1py(filename)
+
+            # Save the hash to a text file
+            self.save_hash_to_file(file_item.filename, file_hash)
+
+            message = file_item.filename
 
         self.send_response(200)
         self.send_header('Content-type', 'text/plain')
         self.send_header('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
         self.end_headers()
 
-        self.wfile.write(hashed_message.encode())
+        self.wfile.write(message.encode())
+        
     def do_GET(self):
         if self.path == '/files':
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
-            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+            self.send_header("Access-Control-Max-Age", "86400")
             self.end_headers()
 
             files_list = os.listdir(UPLOAD_DIR)
@@ -79,7 +88,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'application/octet-stream')
                 self.send_header('Content-Disposition', f'attachment; filename="{filename}"')
-                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
+                self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+                self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+                self.send_header("Access-Control-Max-Age", "86400")
                 self.end_headers()
                 self.wfile.write(content)     
             else:
@@ -92,7 +104,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'Not found')
 
             
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8000):
+def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8001):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f'Starting server on port {port}...')

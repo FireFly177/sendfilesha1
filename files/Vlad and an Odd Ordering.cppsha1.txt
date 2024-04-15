@@ -1,2 +1,0 @@
-Original Filename: Vlad and an Odd Ordering.cpp
-File Hash: cec63a0fda1c18fb5720852ea8ba4e84d5845f5e

@@ -1,2 +1,0 @@
-Original Filename: problem1.cpp
-File Hash: 47d4cae00d182b71f76242d311399db6c7bd53e2
